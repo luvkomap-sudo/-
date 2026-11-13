@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Пестова Екатерина — Особенный подарок</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<style>
+  @font-face {
+    font-family: 'FindSans Pro';
+    src: url('fontsFindSansPro-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root{
+    --chantilly: #FDCCE6;
+    --black-rock: #08033D;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  body{
+    font-family: 'FindSans Pro', 'Inter', sans-serif;
+    background-color: var(--chantilly);
+    color: var(--black-rock);
+    overflow-x:hidden;
+  }
+
+  /* СТРАНИЦА 1 */
+  .page-1 {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  #particle-canvas {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 1;
+  }
+  .hero-content { position: relative; z-index: 2; text-align: center; padding: 20px; }
+  .hero-content .top-text {
+    font-size: clamp(1.2rem, 2.5vw, 2rem);
+    text-transform: uppercase; letter-spacing: 6px; margin-bottom: 15px;
+  }
+  .hero-content h1 {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: clamp(4rem, 12vw, 10rem); line-height: 0.9;
+    text-transform: uppercase; letter-spacing: -3px; margin: 0;
+  }
+  .hero-content .bottom-text {
+    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+    letter-spacing: 8px; text-transform: uppercase; margin-top: 25px;
+  }
+  .scroll-hint {
+    position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+    font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase;
+    z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .scroll-hint::after {
+    content: ''; width: 1px; height: 40px; background: var(--black-rock);
+    animation: drop 2s infinite;
+  }
+  @keyframes drop {
+    0% { transform: scaleY(0); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+    51% { transform: scaleY(1); transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+
+  /* СТРАНИЦА 2 */
+  .page-2 {
+    background-color: var(--black-rock);
+    color: var(--chantilly);
+    padding: 100px 5vw 80px;
+    min-height: 100vh;
+  }
+  .section-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 80px; border-bottom: 1px solid rgba(253, 204, 230, 0.3);
+    padding-bottom: 20px; max-width: 1200px; margin-left: auto; margin-right: auto;
+  }
+  .section-header h2 {
+    font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 400;
+  }
+  .section-header h2 span { font-style: italic; opacity: 0.7; }
+  .author-tag {
+    font-size: 0.9rem; letter-spacing: 3px; text-transform: uppercase; opacity: 0.8;
+  }
+
+  /* СЕТКА ГАЛЕРЕИ (ПО 2 В РЯД) */
+  .gallery {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 80px 60px; max-width: 1200px; margin: 0 auto;
+  }
+  @media (max-width: 768px) {
+    .gallery { grid-template-columns: 1fr; gap: 50px 0; }
+    .section-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  }
+
+  /* КАРТОЧКА С СЮРПРИЗОМ */
+  .card {
+    position: relative; cursor: pointer;
+  }
+  .card .image-wrapper {
+    position: relative; background: #110a4d;
+    padding: 15px; border: 1px solid rgba(253, 204, 230, 0.2);
+    transition: border-color 0.4s ease; overflow: hidden;
+  }
+  .card:hover .image-wrapper {
+    border-color: var(--chantilly);
+  }
+
+  /* Внутренний контейнер */
+  .card .img-container {
+    position: relative; width: 100%; padding-top: 133%; /* Пропорции постера */
+    overflow: hidden;
+  }
+  
+  .card .img-container .actual-img {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover; 
+    opacity: 0; /* Изначально картинка скрыта */
+    transform: scale(0.8); /* И уменьшена */
+  }
+
+  /* КАРТИНКА-УПАКОВКА (Бант) */
+  .card .wrapper-img {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover; z-index: 10;
+    pointer-events: none;
+    transition: transform 0.4s ease; /* Только для ховера */
+  }
+
+  /* Покачивание упаковки при наведении */
+  .card:not(.opened):hover .wrapper-img {
+    transform: scale(1.05) rotate(2deg);
+  }
+
+  /* Подписи */
+  .card .label {
+    padding-top: 25px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .card .label-title {
+    font-family: 'Playfair Display', serif; font-size: 1.8rem; font-style: italic;
+    transition: color 0.4s ease;
+  }
+  .card.opened .label-title { color: var(--chantilly); }
+  
+  .card .label-num {
+    font-size: 1.2rem; letter-spacing: 2px; opacity: 0.6;
+  }
+
+  /* =========================================
+     МОДАЛЬНОЕ ОКНО (ЛАЙТБОКС)
+     ========================================= */
+  .lightbox {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(8, 3, 61, 0.95); backdrop-filter: blur(8px);
+    z-index: 1000; display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+  }
+  .lightbox.active { opacity: 1; pointer-events: all; }
+  .lightbox-content {
+    position: relative; max-width: 90vw; max-height: 85vh;
+    display: flex; flex-direction: column; align-items: center;
+    transform: scale(0.95); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .lightbox.active .lightbox-content { transform: scale(1); }
+  .lightbox img {
+    max-width: 100%; max-height: 75vh; object-fit: contain;
+    border: 2px solid var(--chantilly); box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  }
+  .lightbox-info { margin-top: 25px; display: flex; gap: 20px; align-items: center; }
+  .lightbox-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--chantilly); font-style: italic; }
+  
+  .btn-download {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--chantilly); color: var(--black-rock);
+    padding: 12px 24px; text-decoration: none;
+    font-family: 'FindSans Pro', 'Inter', sans-serif; font-size: 0.9rem;
+    text-transform: uppercase; letter-spacing: 2px; font-weight: 600;
+    border-radius: 4px; transition: all 0.3s ease; cursor: pointer; border: none;
+  }
+  .btn-download:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(253, 204, 230, 0.3); }
+  
+  .lightbox-close {
+    position: absolute; top: -40px; right: 0; background: none; border: none;
+    color: var(--chantilly); font-size: 2.5rem; cursor: pointer;
+    opacity: 0.7; transition: opacity 0.3s; line-height: 1;
+  }
+  .lightbox-close:hover { opacity: 1; }
+
+  /* FOOTER */
+  footer {
+    background-color: #050224; color: var(--chantilly); text-align: center;
+    padding: 80px 20px 50px; border-top: 1px solid rgba(253, 204, 230, 0.1);
+  }
+  .congratulations {
+    max-width: 650px; margin: 0 auto 60px; text-align: center;
+    padding: 40px; background: rgba(253, 204, 230, 0.03);
+    border: 1px solid rgba(253, 204, 230, 0.1); border-radius: 12px;
+  }
+  .congratulations h3 {
+    font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3vw, 2.5rem);
+    font-style: italic; margin-bottom: 25px;
+  }
+  .congratulations p {
+    font-size: clamp(1rem, 1.5vw, 1.1rem); line-height: 1.8; opacity: 0.9; margin-bottom: 20px;
+  }
+  .congratulations .love {
+    font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.5rem; margin-top: 30px;
+  }
+  .studio-name {
+    font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 4vw, 2.5rem);
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .studio-name span {
+    font-family: 'FindSans Pro', sans-serif; font-size: 1rem;
+    letter-spacing: 5px; opacity: 0.8; display: block; margin-top: 8px;
+  }
+  .copyright { font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase; opacity: 0.5; margin-top: 40px; }
+</style>
+</head>
+<body>
+
+  <section class="page-1">
+    <canvas id="particle-canvas"></canvas>
+    <div class="hero-content">
+      <div class="top-text">С днём рождения</div>
+      <h1>Пестова<br>Екатерина</h1>
+      <div class="bottom-text">Digital Art</div>
+    </div>
+    <div class="scroll-hint">Галерея</div>
+  </section>
+
+  <section class="page-2">
+    <div class="section-header">
+      <h2>Избранные <span>работы</span></h2>
+      <div class="author-tag">Студия дизайна QUOTE</div>
+    </div>
+    <main class="gallery" id="gallery"></main>
+  </section>
+
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-content">
+      <button class="lightbox-close" id="lightbox-close">&times;</button>
+      <img src="" id="lightbox-img" alt="Просмотр">
+      <div class="lightbox-info">
+        <div class="lightbox-title" id="lightbox-title"></div>
+        <a href="" download class="btn-download" id="lightbox-download">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Скачать
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="congratulations">
+      <h3>Катя, с днём рождения!</h3>
+      <p>Ты моя старшая сестра, а значит, ты всегда была для меня примером (даже если иногда мы дрались за пульт). Спасибо, что всегда прикрываешь, поддерживаешь и даешь советы, когда я сама не знаю, что делать.</p>
+      <p>Желаю тебе побольше поводов для искренней радости, чтобы энергии хватало на всё, что ты задумала, и чтобы вокруг были только те люди, с которыми тепло. Будь самой счастливой!</p>
+      <p class="love">Твоя Лера</p>
+    </div>
+    <div class="studio-name">
+      QUOTE
+      <span>Студия дизайна Цветковой Валерии</span>
+    </div>
+    <div class="copyright">© 2026 · Все права защищены</div>
+  </footer>
+
+<script>
+const items = [
+  {img:'1.jpg',   title:'Childhood'},                  
+  {img:'2.png',   title:'Forever young'},              
+  {img:'3.png',   title:'Stitched into the heart'},    
+  {img:'4.png',   title:'Made with love'},             
+  {img:'5.png',   title:'Misato & Ekaterina'},         
+  {img:'6.png',   title:'Shot by Cupid'},              
+  {img:'7.png',   title:'Love: 1'},                    
+  {img:'8.png',   title:'23 Years'},                   
+  {img:'9.png',   title:'Birthday'},                   
+  {img:'10.png',  title:'Her Majesty, the Beer'},      
+  {img:'11.png',  title:'Pirokinesis'},                
+  {img:'12.png',  title:'Playingtheangel'}             
+];
+
+const gallery = document.getElementById('gallery');
+const wrapperImgSrc = '13.jpg'; 
+
+items.forEach((item, i) => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  
+  card.innerHTML = `
+    <div class="image-wrapper">
+      <div class="img-container">
+        <img src="${item.img}" alt="${item.title}" class="actual-img" loading="lazy">
+        <img src="${wrapperImgSrc}" alt="Упаковка" class="wrapper-img" loading="lazy">
+      </div>
+    </div>
+    <div class="label">
+      <div class="label-title">???</div>
+      <div class="label-num">${String(i+1).padStart(2,'0')}</div>
+    </div>
+  `;
+
+  card.addEventListener('click', () => {
+    if (!card.classList.contains('opened')) {
+      // 1. Ставим класс opened
+      card.classList.add('opened');
+      
+      const wrapper = card.querySelector('.wrapper-img');
+      const actualImg = card.querySelector('.actual-img');
+      const title = card.querySelector('.label-title');
+      
+      // Меняем текст на настоящий
+      title.textContent = item.title;
+
+      // 2. Анимация упаковки: она улетает вниз, крутится и исчезает
+      gsap.to(wrapper, {
+        y: 250,
+        rotation: 20,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.in",
+        onComplete: () => {
+          wrapper.style.display = 'none'; // Убираем навсегда
+        }
+      });
+
+      // 3. Анимация появления самой картинки
+      gsap.fromTo(actualImg, 
+        { scale: 0.8, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.8, delay: 0.3, ease: "back.out(1.2)" }
+      );
+
+    } else {
+      // Если уже открыта — показываем лайтбокс
+      openLightbox(item.img, item.title);
+    }
+  });
+
+  gallery.appendChild(card);
+});
+
+/* =====================================================
+   ЛОГИКА МОДАЛЬНОГО ОКНА
+   ===================================================== */
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightbox-img');
+const lightboxTitle = document.getElementById('lightbox-title');
+const lightboxDownload = document.getElementById('lightbox-download');
+const lightboxClose = document.getElementById('lightbox-close');
+
+function openLightbox(imgSrc, title) {
+  lightboxImg.src = imgSrc;
+  lightboxTitle.textContent = title;
+  lightboxDownload.href = imgSrc;
+  const ext = imgSrc.split('.').pop();
+  lightboxDownload.setAttribute('download', `QUOTE_${title}.${ext}`);
+  lightbox.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  lightbox.classList.remove('active');
+  document.body.style.overflow = '';
+  setTimeout(() => { lightboxImg.src = ''; }, 400);
+}
+
+lightboxClose.addEventListener('click', closeLightbox);
+lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && lightbox.classList.contains('active')) closeLightbox(); });
+
+/* =====================================================
+   ЧАСТИЦЫ И АНИМАЦИИ СКРОЛЛА
+   ===================================================== */
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+class Particle {
+  constructor() {
+    this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+    this.size = Math.random() * 4 + 1; this.speedX = Math.random() * 0.5 - 0.25;
+    this.speedY = Math.random() * -1 - 0.5; this.opacity = Math.random() * 0.6 + 0.2;
+  }
+  update() {
+    this.x += this.speedX; this.y += this.speedY;
+    if (this.y < 0) { this.y = canvas.height; this.x = Math.random() * canvas.width; }
+  }
+  draw() {
+    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(8, 3, 61, ${this.opacity})`; ctx.fill();
+  }
+}
+
+for (let i = 0; i < Math.floor(window.innerWidth / 20); i++) particles.push(new Particle());
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+gsap.registerPlugin(ScrollTrigger);
+gsap.from('.hero-content > *', {
+  y: 30, opacity: 0, duration: 1, stagger: 0.2, ease: 'power3.out'
+});
+
+gsap.utils.toArray('.card').forEach((card, i) => {
+  gsap.from(card, {
+    y: 80, opacity: 0, duration: 1, ease: 'power3.out',
+    scrollTrigger: { trigger: card, start: 'top 85%', toggleActions: 'play none none reverse' },
+    delay: (i % 2) * 0.15 
+  });
+  card.addEventListener('mouseenter', () => {
+    if (!card.classList.contains('opened')) {
+      gsap.to(card, { y: -10, duration: 0.4, ease: 'power2.out' });
+    }
+  });
+  card.addEventListener('mouseleave', () => {
+    if (!card.classList.contains('opened')) {
+      gsap.to(card, { y: 0, duration: 0.4, ease: 'power2.out' });
+    }
+  });
+});
+</script>
+</body>
+</html>
